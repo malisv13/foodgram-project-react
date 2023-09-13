@@ -19,7 +19,7 @@ jobs:
       # На GitHub Actions есть готовые описания шагов, 
       # их можно использовать в своих workflow.
       # Применим готовое описание шага для получения исходного кода
-      - name: Check  # Имя шага задаём сами
+      - name: Check out repository code  # Имя шага задаём сами
         uses: actions/checkout@v3  # Берём готовое решение из библиотеки GitHub Actions
       # Выполняем команду tree в текущей директории
       - name: Print project tree
