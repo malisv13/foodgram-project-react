@@ -2,42 +2,52 @@ from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from foodgram_backend.settings import FILE_NAME
-from recipes.models import (Favorite, Ingredient,
-                            Recipe, IngredientsInRecipe,
-                            ShoppingCart, Tag)
-from rest_framework import filters, status
-from .mixins import ModelMixinSet
+
+from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
+
+from foodgram_backend.settings import FILE_NAME
+from recipes.models import (Recipe, Tag,
+                            Ingredient, IngredientsInRecipe,
+                            Favorite, ShoppingCart)
 from users.models import Subscribe, User
-
+from .mixins import ModelMixinSet
 from .filters import RecipeFilter
-from rest_framework.pagination import PageNumberPagination
-from .permissions import IsAuthorOrReadOnly
-from .serializers import (IngredientSerializer, RecipeActivitySerializer,
-                          RecipeReadSerializer, RecipeSerializer,
+from .pagination import CustomPagination
+from .serializers import (CustomUserSerializer, CustomUserCreateSerializer,
+                          RecipeSerializer, RecipeReadSerializer,
+                          RecipeActivitySerializer, IngredientSerializer,
                           ChangePasswordSerializer, SubscribeAuthorSerializer,
-                          SubscriptionsSerializer, TagSerializer,
-                          UserCreateSerializer, UserSerializer)
+                          SubscriptionsSerializer, TagSerializer)
 
 
-class UserViewSet(ModelMixinSet):
+class CustomUserViewSet(ModelMixinSet):
     queryset = User.objects.all()
-    permission_classes = (AllowAny,)
-    pagination_class = PageNumberPagination
+    permission_classes = (AllowAny, )
+    pagination_class = CustomPagination
 
     def get_serializer_class(self):
         if self.action in ('list', 'retrieve'):
-            return UserSerializer
-        return UserCreateSerializer
+            return CustomUserSerializer
+        return CustomUserCreateSerializer
 
-    @action(detail=False, methods=['get'],
-            pagination_class=None,
-            permission_classes=(IsAuthenticated,))
+    @action(
+        detail=False,
+        methods=('get', 'patch'),
+        url_path='me',
+        permission_classes=(IsAuthenticated, )
+    )
     def me(self, request):
-        serializer = UserSerializer(request.user)
+        if request.method == 'PATCH':
+            serializer = CustomUserSerializer(
+                request.user,
+                data=request.data,
+                partial=True
+            )
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        serializer = CustomUserSerializer(request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     @action(detail=False, methods=['post'],
@@ -53,7 +63,7 @@ class UserViewSet(ModelMixinSet):
 
     @action(detail=False, methods=['get'],
             permission_classes=(IsAuthenticated,),
-            pagination_class=PageNumberPagination)
+            pagination_class=CustomPagination)
     def subscriptions(self, request):
         queryset = User.objects.filter(subscribing__user=request.user)
         page = self.paginate_queryset(queryset)
@@ -89,26 +99,9 @@ class UserViewSet(ModelMixinSet):
             )
 
 
-class IngredientViewSet(ModelMixinSet):
-    queryset = Ingredient.objects.all()
-    permission_classes = (AllowAny, )
-    serializer_class = IngredientSerializer
-    pagination_class = None
-    filter_backends = (filters.SearchFilter, )
-    search_fields = ('^name', )
-
-
-class TagViewSet(ModelMixinSet):
-    permission_classes = (AllowAny, )
-    queryset = Tag.objects.all()
-    serializer_class = TagSerializer
-    pagination_class = None
-
-
-class RecipeViewSet(ModelMixinSet):
+class RecipeViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Recipe.objects.all()
-    pagination_class = PageNumberPagination
-    permission_classes = (IsAuthorOrReadOnly, )
+    pagination_class = CustomPagination
     filter_backends = (DjangoFilterBackend, )
     filterset_class = RecipeFilter
     http_method_names = ['get', 'post', 'patch', 'create', 'delete']
@@ -210,3 +203,17 @@ class RecipeViewSet(ModelMixinSet):
                             content_type='text/plain')
         file['Content-Disposition'] = (f'attachment; filename={FILE_NAME}')
         return file
+
+
+class TagViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Tag.objects.all()
+    serializer_class = TagSerializer
+    pagination_class = None
+
+
+class IngredientViewSet(viewsets.ReadOnlyModelViewSet):
+    queryset = Ingredient.objects.all()
+    serializer_class = IngredientSerializer
+    filter_backends = (filters.SearchFilter, )
+    search_fields = ('^name', )
+    pagination_class = None

@@ -10,7 +10,7 @@ class User(AbstractUser):
     )
 
     class Meta:
-        ordering = ('username',)
+        ordering = ['id']
         constraints = [
             models.UniqueConstraint(fields=('username', 'email'),
                                     name='unique_username&email')

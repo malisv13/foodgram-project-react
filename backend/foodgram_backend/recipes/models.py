@@ -1,5 +1,6 @@
 from django.core.validators import MinValueValidator, RegexValidator
 from django.db import models
+
 from users.models import User
 
 
@@ -14,9 +15,9 @@ class Ingredient(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Ингридиент'
-        verbose_name_plural = 'Ингридиенты'
         ordering = ['name']
+        verbose_name = 'Ингредиент'
+        verbose_name_plural = 'Ингредиенты'
 
     def __str__(self):
         return f'{self.name}, {self.measurement_unit}'
@@ -46,6 +47,7 @@ class Tag(models.Model):
     )
 
     class Meta:
+        ordering = ['name']
         verbose_name = 'Тег'
         verbose_name_plural = 'Теги'
 
@@ -119,6 +121,7 @@ class IngredientsInRecipe(models.Model):
     )
 
     class Meta:
+        ordering = ['id']
         verbose_name = 'Ингредиенты в рецепте'
         verbose_name_plural = 'Ингредиенты в рецептах'
 
@@ -161,23 +164,23 @@ class ShoppingCart(models.Model):
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='shopping_user',
-        verbose_name='Пользователь, ктр добавил в список'
+        related_name='shoppingcart_on_user',
+        verbose_name='Пользователь, ктр добавил в список покупок'
     )
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='shopping_recipe',
-        verbose_name='Рецепт в списке'
+        related_name='recipe_in_shoppingcart',
+        verbose_name='Рецепт в списке покупок'
     )
 
     class Meta:
-        verbose_name = 'Список'
-        verbose_name_plural = 'Список'
+        verbose_name = 'Список покупок'
+        verbose_name_plural = 'Список покупок'
         constraints = [
             models.UniqueConstraint(
                 fields=['user', 'recipe'],
-                name='unique_shopping_cart'
+                name='unique_shoppingcart'
             )
         ]
 
