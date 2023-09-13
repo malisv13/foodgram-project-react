@@ -267,7 +267,7 @@ class RecipeReadSerializer(serializers.ModelSerializer):
             and ShoppingCart.objects.filter(
                 user=self.context['request'].user, recipe=obj).exists()
         )
-
+#vbveradbersb
 
 class RecipeActivitySerializer(serializers.ModelSerializer):
     tags = serializers.PrimaryKeyRelatedField(
