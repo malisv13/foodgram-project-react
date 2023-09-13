@@ -1,8 +1,8 @@
 import csv
 import os
-from foodgram_backend import settings
 
 from django.core.management.base import BaseCommand
+from foodgram_backend import settings
 from progress.bar import IncrementalBar
 from recipes.models import Ingredient
 
