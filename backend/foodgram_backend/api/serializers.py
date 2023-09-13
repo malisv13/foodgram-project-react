@@ -14,7 +14,6 @@ from recipes.models import (Recipe, Tag,
 from users.models import Subscribe, User
 
 
-
 class CustomUserSerializer(UserSerializer):
     is_subscribed = serializers.SerializerMethodField()
 
@@ -34,8 +33,8 @@ class CustomUserSerializer(UserSerializer):
         if request is not None:
            current_user = request.user
            if current_user.is_authenticated:
-            return Subscribe.objects.filter(user=current_user,
-                                            author=obj).exists()
+               return Subscribe.objects.filter(user=current_user,
+                                               author=obj).exists()
         return False
 
 
@@ -267,7 +266,7 @@ class RecipeReadSerializer(serializers.ModelSerializer):
             and ShoppingCart.objects.filter(
                 user=self.context['request'].user, recipe=obj).exists()
         )
-#vbveradbersb
+
 
 class RecipeActivitySerializer(serializers.ModelSerializer):
     tags = serializers.PrimaryKeyRelatedField(
