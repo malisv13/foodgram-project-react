@@ -129,10 +129,10 @@ class SubscriptionsSerializer(serializers.ModelSerializer):
     def get_is_subscribed(self, obj):
         request = self.context.get('request')
         if request is not None:
-           current_user = request.user
-           if current_user.is_authenticated:
-            return Subscribe.objects.filter(user=current_user,
-                                            author=obj).exists()
+            current_user = request.user
+            if current_user.is_authenticated:
+                return Subscribe.objects.filter(user=current_user,
+                                                author=obj).exists()
         return False
 
     def get_recipes_count(self, obj):
@@ -182,6 +182,7 @@ class SubscribeAuthorSerializer(serializers.ModelSerializer):
 
     def get_recipes_count(self, obj):
         return obj.recipes.count()
+
 
 class TagSerializer(serializers.ModelSerializer):
 
@@ -249,10 +250,10 @@ class RecipeReadSerializer(serializers.ModelSerializer):
     def get_is_favorited(self, obj):
         request = self.context.get('request')
         if request is not None:
-           current_user = request.user
-           if current_user.is_authenticated:
-            return Favorite.objects.filter(user=current_user,
-                                            author=obj).exists()
+            current_user = request.user
+            if current_user.is_authenticated:
+                return Favorite.objects.filter(user=current_user,
+                                               author=obj).exists()
         return False
 
     def get_is_in_shopping_cart(self, obj):
