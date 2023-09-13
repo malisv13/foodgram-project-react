@@ -31,10 +31,10 @@ class CustomUserSerializer(UserSerializer):
     def get_is_subscribed(self, obj):
         request = self.context.get('request')
         if request is not None:
-           current_user = request.user
-           if current_user.is_authenticated:
-               return Subscribe.objects.filter(user=current_user,
-                                               author=obj).exists()
+            current_user = request.user
+            if current_user.is_authenticated:
+                return Subscribe.objects.filter(user=current_user,
+                                                author=obj).exists()
         return False
 
 
