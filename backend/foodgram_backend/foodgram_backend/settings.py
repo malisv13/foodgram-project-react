@@ -30,7 +30,7 @@ SECRET_KEY = ')$(e98h2!eiv2h8tkni+o&=#r44l9wmv(+^v%f9!-zq%wg3mz('
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['yourrecipes.ddnsking.com']
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(',') if os.getenv('ALLOWED_HOSTS') is not None else []
 
 CSRF_TRUSTED_ORIGINS = ['https://yourrecipes.ddnsking.com']
 
@@ -143,9 +143,9 @@ REST_FRAMEWORK = {
 DJOSER = {
     'LOGIN_FIELD': 'email',
     'SERIALIZERS': {
-        'user_create': 'api.serializers.UserCreateSerializer',
-        'user': 'api.serializers.UserSerializer',
-        'current_user': 'api.serializers.UserSerializer',
+        'user_create': 'api.serializers.CustomUserCreateSerializer',
+        'user': 'api.serializers.CustomUserSerializer',
+        'current_user': 'api.serializers.CustomUserSerializer',
     },
 
     'PERMISSIONS': {
@@ -153,7 +153,6 @@ DJOSER = {
         'user_list': ['rest_framework.permissions.AllowAny'],
         'token_create': ['rest_framework.permissions.AllowAny'],
     },
-    'HIDE_USERS': False,
 }
 
 FILE_NAME = 'shopping_cart.txt'
