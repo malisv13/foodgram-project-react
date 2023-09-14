@@ -30,7 +30,7 @@ SECRET_KEY = ')$(e98h2!eiv2h8tkni+o&=#r44l9wmv(+^v%f9!-zq%wg3mz('
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS').split(',') if os.getenv('ALLOWED_HOSTS') is not None else []
+ALLOWED_HOSTS = ['yourrecipes.ddnsking.com']
 
 CSRF_TRUSTED_ORIGINS = ['https://yourrecipes.ddnsking.com']
 
