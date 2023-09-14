@@ -16,7 +16,7 @@ from .mixins import ModelMixinSet
 from .pagination import CustomPagination
 from .serializers import (ChangePasswordSerializer, CustomUserCreateSerializer,
                           CustomUserSerializer, IngredientSerializer,
-                          RecipeActivitySerializer, RecipeReadSerializer,
+                          RecipeActivitySerializer, RecipeGetSerializer,
                           RecipeSerializer, SubscribeAuthorSerializer,
                           SubscriptionsSerializer, TagSerializer)
 
@@ -106,12 +106,12 @@ class RecipeViewSet(viewsets.ReadOnlyModelViewSet):
 
     def get_serializer_class(self):
         if self.action in ('list', 'retrieve'):
-            return RecipeReadSerializer
+            return RecipeGetSerializer
         return RecipeActivitySerializer
 
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=(IsAuthenticated,))
-    def favorite(self, request, **kwargs):
+    def go_favorite(self, request, **kwargs):
         recipe = get_object_or_404(Recipe, id=kwargs['pk'])
 
         if request.method == 'POST':
@@ -149,7 +149,7 @@ class RecipeViewSet(viewsets.ReadOnlyModelViewSet):
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=(IsAuthenticated,),
             pagination_class=None)
-    def shopping_cart(self, request, **kwargs):
+    def create_shopping_cart(self, request, **kwargs):
         recipe = get_object_or_404(Recipe, id=kwargs['pk'])
 
         if request.method == 'POST':
