@@ -51,7 +51,7 @@ class CustomUserViewSet(ModelMixinSet):
 
     @action(detail=False, methods=['post'],
             permission_classes=(IsAuthenticated,))
-    def set_password(self, request):
+    def change_password(self, request):
         serializer = ChangePasswordSerializer(request.user, data=request.data)
         if serializer.is_valid(raise_exception=True):
             serializer.save()
