@@ -153,6 +153,7 @@ DJOSER = {
         'user_list': ['rest_framework.permissions.AllowAny'],
         'token_create': ['rest_framework.permissions.AllowAny'],
     },
+    'HIDE_USERS': False
 }
 
 FILE_NAME = 'shopping_cart.txt'

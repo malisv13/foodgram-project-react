@@ -219,7 +219,7 @@ class IngredientsInRecipeSerializer(serializers.ModelSerializer):
 
 
 class RecipeGetSerializer(serializers.ModelSerializer):
-    author = UserSerializer(read_only=True)
+    author = CustomUserSerializer(read_only=True)
     tags = TagSerializer(many=True, read_only=True)
     ingredients = IngredientsInRecipeSerializer(
         many=True, read_only=True, source='recipes')
@@ -261,7 +261,7 @@ class RecipeGetSerializer(serializers.ModelSerializer):
 
 class RecipeActivitySerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField()
-    author = UserSerializer(read_only=True)
+    author = CustomUserSerializer(read_only=True)
     tags = serializers.PrimaryKeyRelatedField(
         many=True,
         queryset=Tag.objects.all()
@@ -282,28 +282,6 @@ class RecipeActivitySerializer(serializers.ModelSerializer):
             'author'
         )
 
-    def validate(self, obj):
-        for field in ['name', 'text', 'cooking_time']:
-            if not obj.get(field):
-                raise serializers.ValidationError(
-                    f'{field} - Обязательное поле'
-                )
-        if not obj.get('tags'):
-            raise serializers.ValidationError(
-                'Нужно указать минимум 1 тег'
-            )
-        if not obj.get('ingredients'):
-            raise serializers.ValidationError(
-                'Нужно указать минимум 1 ингредиент'
-            )
-        inrgedient_id_list = [item['id'] for item in obj.get('ingredients')]
-        unique_ingredient_id_list = set(inrgedient_id_list)
-        if len(inrgedient_id_list) != len(unique_ingredient_id_list):
-            raise serializers.ValidationError(
-                'Ингредиенты должны быть уникальны'
-            )
-        return obj
-
     @transaction.atomic
     def set_tags_ingredients(self, recipe, tags, ingredients):
         recipe.tags.set(tags)
@@ -319,33 +297,13 @@ class RecipeActivitySerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         ingredients = validated_data.pop('ingredients')
         tags = validated_data.pop('tags')
-        image = validated_data.pop('image')
-        name = validated_data.pop('name')
-        text = validated_data.pop('text')
-        cooking_time = validated_data.pop('cooking_time')
-        author = validated_data.pop('author')
-        recipe = Recipe.objects.create(
-            author=author,
-            name=name,
-            image=image,
-            text=text,
-            cooking_time=cooking_time,
-        )
-        recipe = self.set_tags_ingredients(
-            tags,
-            ingredients,
-            recipe
-        )
+        recipe = Recipe.objects.create(author=self.context['request'].user,
+                                       **validated_data)
+        self.set_tags_ingredients(recipe, tags, ingredients)
         return recipe
 
     @transaction.atomic
     def update(self, instance, validated_data):
-        instance.image = validated_data.get('image', instance.image)
-        instance.name = validated_data.get('name', instance.name)
-        instance.text = validated_data.get('text', instance.text)
-        instance.cooking_time = validated_data.get(
-            'cooking_time', instance.cooking_time
-        )
         tags = validated_data.pop('tags')
         ingredients = validated_data.pop('ingredients')
         IngredientsInRecipe.objects.filter(
