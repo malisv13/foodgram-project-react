@@ -23,7 +23,7 @@ class CustomUserSerializer(UserSerializer):
             'is_subscribed'
         )
 
-    def get_subscribed(self, obj):
+    def get_is_subscribed(self, obj):
         request = self.context.get('request')
         if request is not None:
             current_user = request.user
@@ -45,11 +45,6 @@ class CustomUserCreateSerializer(UserCreateSerializer):
             'last_name',
             'password'
         )
-        extra_kwargs = {
-            'first_name': {'required': True, 'allow_blank': False},
-            'last_name': {'required': True, 'allow_blank': False},
-            'email': {'required': True, 'allow_blank': False},
-        }
 
     def validate(self, obj):
         invalid_usernames = [
@@ -173,7 +168,7 @@ class SubscribeAuthorSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError({'errors': 'Ошибка подписки'})
         return obj
 
-    def get_subscribed(self, obj):
+    def get_is_subscribed(self, obj):
         return (
             self.context.get('request').user.is_authenticated
             and Subscribe.objects.filter(user=self.context['request'].user,
@@ -322,11 +317,25 @@ class RecipeActivitySerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def create(self, validated_data):
-        tags = validated_data.pop('tags')
         ingredients = validated_data.pop('ingredients')
-        recipe = Recipe.objects.create(author=self.context['request'].user,
-                                       **validated_data)
-        self.set_tags_ingredients(recipe, tags, ingredients)
+        tags = validated_data.pop('tags')
+        image = validated_data.pop('image')
+        name = validated_data.pop('name')
+        text = validated_data.pop('text')
+        cooking_time = validated_data.pop('cooking_time')
+        author = validated_data.pop('author')
+        recipe = Recipe.objects.create(
+            author=author,
+            name=name,
+            image=image,
+            text=text,
+            cooking_time=cooking_time,
+        )
+        recipe = self.set_tags_ingredients(
+            tags,
+            ingredients,
+            recipe
+        )
         return recipe
 
     @transaction.atomic

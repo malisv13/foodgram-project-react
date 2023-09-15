@@ -105,13 +105,13 @@ class RecipeViewSet(viewsets.ReadOnlyModelViewSet):
     http_method_names = ['get', 'post', 'patch', 'create', 'delete']
 
     def get_serializer_class(self):
-        if self.action in ('list', 'retrieve'):
+        if self.request.method == 'GET':
             return RecipeGetSerializer
         return RecipeActivitySerializer
 
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=(IsAuthenticated,))
-    def go_favorite(self, request, **kwargs):
+    def favorite(self, request, **kwargs):
         recipe = get_object_or_404(Recipe, id=kwargs['pk'])
 
         if request.method == 'POST':
@@ -149,7 +149,7 @@ class RecipeViewSet(viewsets.ReadOnlyModelViewSet):
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=(IsAuthenticated,),
             pagination_class=None)
-    def create_shopping_cart(self, request, **kwargs):
+    def shopping_cart(self, request, **kwargs):
         recipe = get_object_or_404(Recipe, id=kwargs['pk'])
 
         if request.method == 'POST':
