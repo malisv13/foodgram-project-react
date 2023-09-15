@@ -242,7 +242,7 @@ class RecipeGetSerializer(serializers.ModelSerializer):
             'cooking_time'
         )
 
-    def get_favorited(self, obj):
+    def get_is_favorited(self, obj):
         request = self.context.get('request')
         if request is not None:
             current_user = request.user
@@ -251,7 +251,7 @@ class RecipeGetSerializer(serializers.ModelSerializer):
                                                author=obj).exists()
         return False
 
-    def get_in_shopping_cart(self, obj):
+    def get_is_in_shopping_cart(self, obj):
         return (
             self.context.get('request').user.is_authenticated
             and ShoppingCart.objects.filter(

@@ -14,6 +14,7 @@ from users.models import Subscribe, User
 from .filters import RecipeFilter
 from .mixins import ModelMixinSet
 from .pagination import CustomPagination
+from .permissions import IsAuthorOrReadOnly
 from .serializers import (ChangePasswordSerializer, CustomUserCreateSerializer,
                           CustomUserSerializer, IngredientSerializer,
                           RecipeActivitySerializer, RecipeGetSerializer,
@@ -97,8 +98,9 @@ class CustomUserViewSet(ModelMixinSet):
             )
 
 
-class RecipeViewSet(viewsets.ReadOnlyModelViewSet):
+class RecipeViewSet(viewsets.ModelViewSet):
     queryset = Recipe.objects.all()
+    permission_classes = [IsAuthorOrReadOnly]
     pagination_class = CustomPagination
     filter_backends = (DjangoFilterBackend, )
     filterset_class = RecipeFilter
