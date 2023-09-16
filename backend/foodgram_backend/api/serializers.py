@@ -248,7 +248,7 @@ class RecipeGetSerializer(serializers.ModelSerializer):
             current_user = request.user
             if current_user.is_authenticated:
                 return Favorite.objects.filter(user=current_user,
-                                               author=obj).exists()
+                                               recipe=obj).exists()
         return False
 
     def get_is_in_shopping_cart(self, obj):
