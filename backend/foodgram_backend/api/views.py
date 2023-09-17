@@ -122,7 +122,6 @@ class RecipeViewSet(viewsets.ModelViewSet):
                               recipe=recipe).delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
 
-
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=(IsAuthenticated,),
             pagination_class=None)
@@ -133,7 +132,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
                                           context={"request": request})
             serializer.is_valid(raise_exception=True)
             if not ShoppingCart.objects.filter(user=request.user,
-                                                recipe=recipe).exists():
+                                               recipe=recipe).exists():
                 ShoppingCart.objects.create(user=request.user, recipe=recipe)
                 return Response(serializer.data,
                                 status=status.HTTP_201_CREATED)
@@ -149,7 +148,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         shopping_cart = ShoppingCart.objects.filter(user=request.user)
         recipes_id = [item.recipe.id for item in shopping_cart]
         ingredients = IngredientsInRecipe.objects.filter(
-            recipe__in=recipes_id).values('ingredient__name', 'ingredient__measurement_unit'
+            recipe__in=recipes_id).values('ingredient__name',
+                                          'ingredient__measurement_unit'
                                           ).annotate(amount=Sum('amount'))
         final_list = 'Ваш список покупок:\n\n'
 
@@ -161,7 +161,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
 
         filename = FILE_NAME
         response = HttpResponse(final_list[:-1], content_type='text/plain')
-        response['Content-Disposition'] = 'attachment; filename={0}'.format(filename)
+        response(['Content-Disposition'] = 'attachment; filename={0}'
+                 ).format(filename)
         return response
 
 
