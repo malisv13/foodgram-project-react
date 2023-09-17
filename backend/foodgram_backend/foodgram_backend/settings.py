@@ -30,7 +30,7 @@ SECRET_KEY = ')$(e98h2!eiv2h8tkni+o&=#r44l9wmv(+^v%f9!-zq%wg3mz('
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['yourrecipes.ddnsking.com']
+ALLOWED_HOSTS = ['localhost', 'yourrecipes.ddnsking.com']
 
 CSRF_TRUSTED_ORIGINS = ['https://yourrecipes.ddnsking.com']
 
@@ -135,7 +135,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': [
         'api.pagination.CustomPagination',
     ],
-    'PAGE_SIZE': 10,
+    'PAGE_SIZE': 6,
     'SEARCH_PARAM': 'name',
 }
 
@@ -180,7 +180,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'collected_static'
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # User model
 
