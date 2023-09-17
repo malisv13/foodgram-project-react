@@ -18,8 +18,8 @@ from .permissions import IsAuthorOrReadOnly
 from .serializers import (ChangePasswordSerializer, CustomUserCreateSerializer,
                           CustomUserSerializer, IngredientSerializer,
                           RecipeActivitySerializer, RecipeGetSerializer,
-                          SubscribeAuthorSerializer, SubscriptionsSerializer,
-                          TagSerializer, RecipeSerializer)
+                          RecipeSerializer, SubscribeAuthorSerializer,
+                          SubscriptionsSerializer, TagSerializer)
 
 
 class CustomUserViewSet(ModelMixinSet):
