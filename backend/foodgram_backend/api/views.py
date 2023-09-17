@@ -151,7 +151,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         ingredients = IngredientsInRecipe.objects.filter(
             recipe__in=recipes_id).values('ingredient__name', 'ingredient__measurement_unit'
                                           ).annotate(amount=Sum('amount'))
-        final_list = 'Список покупок от Foodgram\n\n'
+        final_list = 'Ваш список покупок:\n\n'
 
         for item in ingredients:
             ingredient_name = item['ingredient__name']
