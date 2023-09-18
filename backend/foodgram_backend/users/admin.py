@@ -6,7 +6,12 @@ from . import models
 @admin.register(models.User)
 class UserAdmin(admin.ModelAdmin):
     list_display = (
-        'username', 'pk', 'email', 'password', 'first_name', 'last_name',
+        'username',
+        'pk',
+        'email',
+        'password',
+        'first_name',
+        'last_name',
     )
     list_filter = ('username', 'email')
     empty_value_display = '-пусто-'
