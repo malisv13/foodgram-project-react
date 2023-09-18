@@ -156,7 +156,6 @@ DJOSER = {
     'HIDE_USERS': False
 }
 
-FILE_NAME = 'shopping_cart.txt'
 
 
 # Internationalization

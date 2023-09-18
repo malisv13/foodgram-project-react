@@ -2,7 +2,6 @@ from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from foodgram_backend.settings import FILE_NAME
 from recipes.models import (Favorite, Ingredient, IngredientsInRecipe, Recipe,
                             ShoppingCart, Tag)
 from rest_framework import filters, status, viewsets
@@ -151,7 +150,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             recipe__in=recipes_id).values('ingredient__name',
                                           'ingredient__measurement_unit'
                                           ).annotate(amount=Sum('amount'))
-        final_list = 'Ваш список покупок:\n\n'
+        final_list = 'Ваш список покупок:\n'
 
         for item in ingredients:
             ingredient_name = item['ingredient__name']
@@ -159,7 +158,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
             amount = item['amount']
             final_list += f'{ingredient_name} ({measurement_unit}) {amount}\n'
 
-        filename = FILE_NAME
+        filename = 'shopping-list.txt'
         response = HttpResponse(final_list[:-1], content_type='text/plain')
         response['Content-Disposition'] = (
             'attachment; filename={0}'.format(filename)
