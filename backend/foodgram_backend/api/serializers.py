@@ -130,7 +130,9 @@ class SubscribeAuthorSerializer(serializers.ModelSerializer):
 
     def validate(self, obj):
         if (self.context['request'].user == obj):
-            raise serializers.ValidationError({'errors': 'Ошибка подписки'})
+            raise serializers.ValidationError(
+                "Ошибка: нельзя подписать на самого себя"
+            )
         return obj
 
     def get_is_subscribed(self, obj):
