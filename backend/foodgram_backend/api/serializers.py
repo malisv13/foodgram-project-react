@@ -69,7 +69,7 @@ class SubscriptionSerializer(serializers.ModelSerializer):
     is_subscribed = serializers.SerializerMethodField()
     recipes = serializers.SerializerMethodField()
     recipes_count = serializers.IntegerField(
-        source='recipes.count', 
+        source='recipes.count',
         read_only=True
     )
 
@@ -111,7 +111,7 @@ class SubscribeAuthorSerializer(serializers.ModelSerializer):
     is_subscribed = serializers.SerializerMethodField()
     recipes = RecipeSerializer(many=True, read_only=True)
     recipes_count = serializers.IntegerField(
-        source='recipes.count', 
+        source='recipes.count',
         read_only=True
     )
 
