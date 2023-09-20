@@ -2,59 +2,29 @@ from django.db.models import Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from recipes.models import (Favorite, Ingredient, IngredientsInRecipe, Recipe,
-                            ShoppingCart, Tag)
+from djoser.views import UserViewSet
+
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
-from users.models import Subscribe, User
 
+from recipes.models import (Favorite, Ingredient, IngredientsInRecipe, Recipe,
+                            ShoppingCart, Tag)
+from users.models import Subscribe, User
 from .filters import RecipeFilter
-from .mixins import ModelMixinSet
 from .pagination import CustomPagination
 from .permissions import IsAuthorOrReadOnly
-from .serializers import (ChangePasswordSerializer, CustomUserCreateSerializer,
-                          CustomUserSerializer, IngredientSerializer,
-                          RecipeActivitySerializer, RecipeGetSerializer,
-                          RecipeSerializer, SubscribeAuthorSerializer,
-                          SubscriptionsSerializer, TagSerializer)
+from .serializers import (IngredientSerializer, RecipeActivitySerializer,
+                          RecipeGetSerializer, RecipeSerializer,
+                          SubscribeAuthorSerializer, SubscriptionSerializer,
+                          TagSerializer)
 
 
-class CustomUserViewSet(ModelMixinSet):
+class CustomUserViewSet(UserViewSet):
     queryset = User.objects.all()
     permission_classes = (AllowAny, )
     pagination_class = CustomPagination
-
-    def get_serializer_class(self):
-        if self.action in ('list', 'retrieve'):
-            return CustomUserSerializer
-        return CustomUserCreateSerializer
-
-    @action(
-        detail=False,
-        methods=('get', 'patch'),
-        url_path='me',
-        permission_classes=(IsAuthenticated, )
-    )
-    def me(self, request):
-        if request.method == 'PATCH':
-            serializer = CustomUserSerializer(
-                request.user,
-                data=request.data,
-                partial=True
-            )
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        serializer = CustomUserSerializer(request.user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    @action(detail=False, methods=['post'],
-            permission_classes=(IsAuthenticated,))
-    def change_password(self, request):
-        serializer = ChangePasswordSerializer(request.user, data=request.data)
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(detail=False, methods=['get'],
             permission_classes=(IsAuthenticated,),
@@ -62,7 +32,7 @@ class CustomUserViewSet(ModelMixinSet):
     def subscriptions(self, request):
         queryset = User.objects.filter(subscribing__user=request.user)
         page = self.paginate_queryset(queryset)
-        serializer = SubscriptionsSerializer(
+        serializer = SubscriptionSerializer(
             page,
             many=True,
             context={'request': request}
@@ -71,8 +41,8 @@ class CustomUserViewSet(ModelMixinSet):
 
     @action(detail=True, methods=['post', 'delete'],
             permission_classes=(IsAuthenticated,))
-    def subscribe(self, request, **kwargs):
-        author = get_object_or_404(User, id=kwargs['pk'])
+    def subscribe(self, request, id=None):
+        author = get_object_or_404(User, pk=id)
         if request.method == 'POST':
             serializer = SubscribeAuthorSerializer(
                 author, data=request.data, context={"request": request}
