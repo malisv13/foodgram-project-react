@@ -278,7 +278,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
                 )
         return ingr
 
-    def validate_cooking_time(self, tags):
+    def validate_tags(self, tags):
         if not tags:
             raise serializers.ValidationError(
                 'Ошибка: отсутствуют теги'
