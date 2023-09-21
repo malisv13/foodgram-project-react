@@ -12,7 +12,7 @@ class BuildShoppingCartFileService:
             measurement_unit = item['ingredient__measurement_unit']
             amount = item['amount']
             final_list += f'{ingredient_name} ({measurement_unit}) {amount}\n'
-        
+
         return final_list[:-1]
 
     @property

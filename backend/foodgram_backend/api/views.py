@@ -84,9 +84,9 @@ class RecipeViewSet(viewsets.ModelViewSet, SubscribeFavoriteShoppingCartMixin):
             user=request.user).values_list('recipe_id')
         ingredients = IngredientsInRecipe.objects.filter(
             recipe__in=recipes_ids).values('ingredient__name',
-                                          'ingredient__measurement_unit'
-                                          ).annotate(amount=Sum('amount'))
-        
+                                           'ingredient__measurement_unit'
+                                           ).annotate(amount=Sum('amount'))
+
         service = BuildShoppingCartFileService(ingredients)
         response = HttpResponse(service.final_list, content_type='text/plain')
         response['Content-Disposition'] = (
