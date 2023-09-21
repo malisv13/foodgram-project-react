@@ -1,59 +1,23 @@
 from django.db.models import Sum
 from django.http import HttpResponse
-from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.views import UserViewSet
 
-from rest_framework import filters, status, viewsets
+from rest_framework import filters, viewsets
 from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.response import Response
 
 from recipes.models import (Favorite, Ingredient, IngredientsInRecipe, Recipe,
                             ShoppingCart, Tag)
 from services.build_shopping_cart_file import BuildShoppingCartFileService
 from users.models import Subscribe, User
 from .filters import RecipeFilter
+from .mixins import SubscribeFavoriteShoppingCartMixin
 from .pagination import CustomPagination
 from .permissions import IsAuthorOrReadOnly
 from .serializers import (IngredientSerializer, RecipeWriteSerializer,
-                          RecipeGetSerializer, RecipeSerializer,
-                          SubscribeAuthorSerializer, SubscriptionSerializer,
+                          RecipeGetSerializer, SubscriptionSerializer,
                           TagSerializer)
-
-class SubscribeFavoriteShoppingCartMixin:
-
-    @staticmethod
-    def create_method(arg, model, author_or_recipe_pk, request):
-        user = request.user
-        if arg == Recipe:
-            recipe = get_object_or_404(arg, pk=author_or_recipe_pk)
-            serializer = RecipeSerializer(instance=recipe, context={'request': request})
-            if not model.objects.filter(recipe=recipe, user=user).exists():
-                model.objects.create(user=user, recipe=recipe)
-                return Response(serializer.data,
-                                    status=status.HTTP_201_CREATED)
-            return Response(status=status.HTTP_400_BAD_REQUEST)
-        if arg == User:
-            author = get_object_or_404(arg, pk=author_or_recipe_pk)
-            serializer = SubscribeAuthorSerializer(
-                instance=author, context={'request': request}
-            )
-            model.objects.create(user=user, author=author)
-            return Response(serializer.data,
-                                status=status.HTTP_201_CREATED)
-
-    @staticmethod
-    def delete_method(arg, model, author_or_recipe_pk, request):
-        user = request.user
-        if arg == Recipe:
-            recipe = get_object_or_404(arg, pk=author_or_recipe_pk)
-            model.objects.filter(user=user, recipe=recipe).delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        if arg == User:
-            author = get_object_or_404(arg, pk=author_or_recipe_pk)
-            model.objects.filter(user=user, author=author).delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class CustomUserViewSet(UserViewSet, SubscribeFavoriteShoppingCartMixin):
