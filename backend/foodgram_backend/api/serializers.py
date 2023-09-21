@@ -1,5 +1,4 @@
 from django.db import transaction
-
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from drf_base64.fields import Base64ImageField
 from rest_framework import serializers
@@ -31,6 +30,19 @@ class CustomUserSerializer(UserSerializer):
                 return Subscribe.objects.filter(user=current_user,
                                                 author=obj).exists()
         return False
+
+
+class AuthUserSerializer(UserSerializer):
+
+    class Meta:
+        model = User
+        fields = (
+            'email',
+            'id',
+            'username',
+            'first_name',
+            'last_name',
+        )
 
 
 class CustomUserCreateSerializer(UserCreateSerializer):
@@ -131,7 +143,7 @@ class SubscribeAuthorSerializer(serializers.ModelSerializer):
     def validate(self, obj):
         if (self.context['request'].user == obj):
             raise serializers.ValidationError(
-                "Ошибка: нельзя подписать на самого себя"
+                'Ошибка: нельзя подписать на самого себя'
             )
         return obj
 
@@ -223,7 +235,7 @@ class RecipeGetSerializer(serializers.ModelSerializer):
         )
 
 
-class RecipeActivitySerializer(serializers.ModelSerializer):
+class RecipeWriteSerializer(serializers.ModelSerializer):
     id = serializers.ReadOnlyField()
     author = CustomUserSerializer(read_only=True)
     tags = serializers.PrimaryKeyRelatedField(
@@ -245,6 +257,46 @@ class RecipeActivitySerializer(serializers.ModelSerializer):
             'cooking_time',
             'author'
         )
+
+    def validate_ingredients(self, ingr):
+        if not ingr:
+            raise serializers.ValidationError(
+                'Ошибка: отсутствуют ингредиенты'
+            )
+        ingredients = self.initial_data.get('ingredients')
+        ingredients_list = []
+        for ingredient in ingredients:
+            ingredient_id = ingredient['id']
+            if ingredient_id in ingredients_list:
+                raise serializers.ValidationError(
+                    'Ошибка: ингредиенты не должны повторяться'
+                )
+            ingredients_list.append(ingredient_id)
+            if int(ingredient['amount']) <= 0:
+                raise serializers.ValidationError(
+                    'Ошибка: вес ингредиентов должен быть больше 0'
+                )
+        return ingr
+
+    def validate_cooking_time(self, tags):
+        if not tags:
+            raise serializers.ValidationError(
+                'Ошибка: отсутствуют теги'
+            )
+        tags_list = []
+        for tag in tags:
+            if tag in tags_list:
+                raise serializers.ValidationError(
+                    'Ошибка: теги не должны повторяться'
+                )
+        return tags
+
+    def validate_cooking_time(self, cooking_time):
+        if cooking_time <= 0:
+            raise serializers.ValidationError(
+                'Ошибка: время приготовления должно быть больше 0'
+            )
+        return cooking_time
 
     @transaction.atomic
     def set_tags_ingredients(self, recipe, tags, ingredients):

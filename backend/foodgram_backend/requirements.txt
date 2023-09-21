@@ -1,7 +1,7 @@
-django_filter==23.2
-djangorestframework==3.14.0
-djoser==2.2.0
-drf_base64==2.0
-Pillow==10.0.0
-psycopg2-binary==2.9.7
+django_filter==23.2 
+djangorestframework==3.14.0 
+djoser==2.2.0 
+drf_base64==2.0 
+Pillow==10.0.0 
+psycopg2-binary==2.9.7 
 python-dotenv==1.0.0
