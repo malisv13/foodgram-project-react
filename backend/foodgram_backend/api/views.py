@@ -80,7 +80,8 @@ class RecipeViewSet(viewsets.ModelViewSet, SubscribeFavoriteShoppingCartMixin):
     @action(detail=False, methods=['get'],
             permission_classes=(IsAuthenticated,))
     def download_shopping_cart(self, request, **kwargs):
-        recipes_ids = ShoppingCart.objects.filter(user=request.user).values_list('recipe_id')
+        recipes_ids = ShoppingCart.objects.filter(
+            user=request.user).values_list('recipe_id')
         ingredients = IngredientsInRecipe.objects.filter(
             recipe__in=recipes_ids).values('ingredient__name',
                                           'ingredient__measurement_unit'
