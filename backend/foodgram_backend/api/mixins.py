@@ -18,7 +18,8 @@ class SubscribeFavoriteShoppingCartMixin:
                 instance=recipe, context={'request': request}
             )
             if not action_model.objects.filter(
-                recipe=recipe, user=user).exists():
+                recipe=recipe, user=user
+            ).exists():
                 action_model.objects.create(user=user, recipe=recipe)
                 return Response(serializer.data,
                                 status=status.HTTP_201_CREATED)
