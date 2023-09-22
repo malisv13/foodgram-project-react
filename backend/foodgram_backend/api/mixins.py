@@ -10,35 +10,35 @@ from .serializers import RecipeSerializer, SubscribeAuthorSerializer
 class SubscribeFavoriteShoppingCartMixin:
 
     @staticmethod
-    def create_method(arg, model, author_or_recipe_pk, request):
+    def create_method(input_model, action_model, author_or_recipe_pk, request):
         user = request.user
-        if arg == Recipe:
-            recipe = get_object_or_404(arg, pk=author_or_recipe_pk)
+        if input_model == Recipe:
+            recipe = get_object_or_404(input_model, pk=author_or_recipe_pk)
             serializer = RecipeSerializer(
                 instance=recipe, context={'request': request}
             )
-            if not model.objects.filter(recipe=recipe, user=user).exists():
-                model.objects.create(user=user, recipe=recipe)
+            if not action_model.objects.filter(recipe=recipe, user=user).exists():
+                action_model.objects.create(user=user, recipe=recipe)
                 return Response(serializer.data,
                                 status=status.HTTP_201_CREATED)
             return Response(status=status.HTTP_400_BAD_REQUEST)
-        if arg == User:
-            author = get_object_or_404(arg, pk=author_or_recipe_pk)
+        if input_model == User:
+            author = get_object_or_404(input_model, pk=author_or_recipe_pk)
             serializer = SubscribeAuthorSerializer(
                 instance=author, context={'request': request}
             )
-            model.objects.create(user=user, author=author)
+            action_model.objects.create(user=user, author=author)
             return Response(serializer.data,
                             status=status.HTTP_201_CREATED)
 
     @staticmethod
-    def delete_method(arg, model, author_or_recipe_pk, request):
+    def delete_method(input_model, action_model, author_or_recipe_pk, request):
         user = request.user
-        if arg == Recipe:
-            recipe = get_object_or_404(arg, pk=author_or_recipe_pk)
-            model.objects.filter(user=user, recipe=recipe).delete()
+        if input_model == Recipe:
+            recipe = get_object_or_404(input_model, pk=author_or_recipe_pk)
+            action_model.objects.filter(user=user, recipe=recipe).delete()
             return Response(status=status.HTTP_204_NO_CONTENT)
-        if arg == User:
-            author = get_object_or_404(arg, pk=author_or_recipe_pk)
-            model.objects.filter(user=user, author=author).delete()
+        if input_model == User:
+            author = get_object_or_404(input_model, pk=author_or_recipe_pk)
+            action_model.objects.filter(user=user, author=author).delete()
             return Response(status=status.HTTP_204_NO_CONTENT)

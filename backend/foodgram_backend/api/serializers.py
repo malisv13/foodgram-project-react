@@ -258,8 +258,8 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
             'author'
         )
 
-    def validate_ingredients(self, ingr):
-        if not ingr:
+    def validate_ingredients(self, ingredients):
+        if not ingredients:
             raise serializers.ValidationError(
                 'Ошибка: отсутствуют ингредиенты'
             )
@@ -276,7 +276,7 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError(
                     'Ошибка: вес ингредиентов должен быть больше 0'
                 )
-        return ingr
+        return ingredients
 
     def validate_tags(self, tags):
         if not tags:
