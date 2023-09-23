@@ -1,4 +1,4 @@
-from django.core.validators import MinValueValidator, RegexValidator
+from django.core.validators import RegexValidator
 from django.db import models
 
 from users.models import User
@@ -71,7 +71,6 @@ class Recipe(models.Model):
     )
     cooking_time = models.IntegerField(
         verbose_name='Время приготовления (в минутах)',
-        validators=[MinValueValidator(1)]
     )
     image = models.ImageField(
         verbose_name='Картинка',
@@ -117,7 +116,6 @@ class IngredientsInRecipe(models.Model):
     )
     amount = models.IntegerField(
         verbose_name='Количество',
-        validators=[MinValueValidator(1)]
     )
 
     class Meta:

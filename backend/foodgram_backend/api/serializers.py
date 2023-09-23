@@ -143,7 +143,7 @@ class SubscribeAuthorSerializer(serializers.ModelSerializer):
     def validate(self, obj):
         if (self.context['request'].user == obj):
             raise serializers.ValidationError(
-                'Ошибка: нельзя подписать на самого себя'
+                'Нельзя подписаться на самого себя'
             )
         return obj
 
@@ -258,43 +258,49 @@ class RecipeWriteSerializer(serializers.ModelSerializer):
             'author'
         )
 
-    def validate_ingredients(self, ingredients):
+    def validate(self, obj):
+        self._validate_ingredients(obj['ingredients'])
+        self._validate_tags(obj['tags'])
+        self._validate_cooking_time(obj['cooking_time'])
+        return obj
+
+    def _validate_ingredients(self, ingredients):
         if not ingredients:
             raise serializers.ValidationError(
-                'Ошибка: отсутствуют ингредиенты'
+                'Отсутствуют ингредиенты'
             )
-        ingredients = self.initial_data.get('ingredients')
+        get_ingredients = self.initial_data.get('ingredients')
         ingredients_list = []
-        for ingredient in ingredients:
+        for ingredient in get_ingredients:
             ingredient_id = ingredient['id']
             if ingredient_id in ingredients_list:
                 raise serializers.ValidationError(
-                    'Ошибка: ингредиенты не должны повторяться'
+                    'Ингредиенты не должны повторяться'
                 )
             ingredients_list.append(ingredient_id)
             if int(ingredient['amount']) <= 0:
                 raise serializers.ValidationError(
-                    'Ошибка: вес ингредиентов должен быть больше 0'
+                    'Вес ингредиентов должен быть больше 0'
                 )
         return ingredients
 
-    def validate_tags(self, tags):
+    def _validate_tags(self, tags):
         if not tags:
             raise serializers.ValidationError(
-                'Ошибка: отсутствуют теги'
+                'Отсутствуют теги'
             )
         tags_list = []
         for tag in tags:
             if tag in tags_list:
                 raise serializers.ValidationError(
-                    'Ошибка: теги не должны повторяться'
+                    'Теги не должны повторяться'
                 )
         return tags
 
-    def validate_cooking_time(self, cooking_time):
+    def _validate_cooking_time(self, cooking_time):
         if cooking_time <= 0:
             raise serializers.ValidationError(
-                'Ошибка: время приготовления должно быть больше 0'
+                'Время приготовления должно быть больше 0'
             )
         return cooking_time
 
