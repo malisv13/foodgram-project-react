@@ -36,9 +36,18 @@ class SubscribeFavoriteShoppingCartMixin:
     @staticmethod
     def delete_method(input_model, action_model, author_or_recipe_pk, request):
         user = request.user
-        author_recipe = get_object_or_404(input_model, pk=author_or_recipe_pk)
+        author_or_recipe = get_object_or_404(
+            input_model,
+            pk=author_or_recipe_pk
+        )
         if input_model == Recipe:
-            action_model.objects.filter(user=user, recipe=author_recipe).delete()
+            action_model.objects.filter(
+                user=user,
+                recipe=author_or_recipe
+            ).delete()
         if input_model == User:
-            action_model.objects.filter(user=user, author=author_recipe).delete()
+            action_model.objects.filter(
+                user=user,
+                author=author_or_recipe
+            ).delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
